@@ -10,6 +10,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 )
 
 // PrintContributors from a GitHub repository
@@ -85,14 +86,16 @@ func GetRepoLicenses(owner, repo string) (spdxID string) {
 }
 
 // GetRepoCreateAt Get the watchers of a GitHub repository
-func GetRepoCreateAt(owner, repo string) (create interface{}) {
+func GetRepoCreateAt(owner, repo string) (create string) {
 	api := fmt.Sprintf("https://api.github.com/repos/%s/%s", owner, repo)
 	var (
 		rst map[string]interface{}
 		err error
 	)
 	if rst, err = ghRequestAsMap(api); err == nil {
-		create = rst["created_at"]
+		createdAtStr := rst["created_at"].(string)
+		createdAt, _ := time.Parse(time.RFC3339, createdAtStr)
+		create = createdAt.Format("2006-01-02")
 	}
 	return
 }
@@ -105,7 +108,9 @@ func GetRepoPushAt(owner, repo string) (lastupdate interface{}) {
 		err error
 	)
 	if rst, err = ghRequestAsMap(api); err == nil {
-		lastupdate = rst["pushed_at"]
+		updateAtStr := rst["pushed_at"].(string)
+		updateAt, _ := time.Parse(time.RFC3339, updateAtStr)
+		lastupdate = updateAt.Format("2006-01-02")
 	}
 	return
 }
