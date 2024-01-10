@@ -37,7 +37,7 @@ inputs:
     required: false
   header:
     description: 'Indicate if include a notice header on the top of the README file (default true)'
-    default: 'true'
+    default: 'false'
     required: false
 runs:
   using: 'docker'

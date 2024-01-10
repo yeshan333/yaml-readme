@@ -328,7 +328,7 @@ Some functions rely on the GitHub API, in order to avoid X-RateLimit-Limit error
 		"The glob pattern with Golang spec to find files")
 	flags.StringVarP(&opt.templateFile, "template", "t", "README.tpl",
 		"The template file which should follow Golang template spec")
-	flags.BoolVarP(&opt.includeHeader, "include-header", "", true,
+	flags.BoolVarP(&opt.includeHeader, "include-header", "", false,
 		"Indicate if include a notice header on the top of the README file")
 	flags.StringVarP(&opt.sortBy, "sort-by", "", "",
 		"Sort the array data descending by which field, or sort it ascending with the prefix '!'. For example: --sort-by !year")
