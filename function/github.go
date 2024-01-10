@@ -39,6 +39,77 @@ func PrintContributors(owner, repo string) (output string) {
 	return
 }
 
+// GetRepoStars Get the stars of a GitHub repository
+func GetRepoStars(owner, repo string) (star interface{}) {
+	api := fmt.Sprintf("https://api.github.com/repos/%s/%s", owner, repo)
+	var (
+		rst map[string]interface{}
+		err error
+	)
+	if rst, err = ghRequestAsMap(api); err == nil {
+		star = rst["stargazers_count"]
+	}
+	return
+}
+
+// GetRepoForks Get the forks of a GitHub repository
+func GetRepoForks(owner, repo string) (fork interface{}) {
+	api := fmt.Sprintf("https://api.github.com/repos/%s/%s", owner, repo)
+	var (
+		rst map[string]interface{}
+		err error
+	)
+	if rst, err = ghRequestAsMap(api); err == nil {
+		fork = rst["forks"]
+	}
+	return
+}
+
+// GetRepoWatchers Get the watchers of a GitHub repository
+func GetRepoLicenses(owner, repo string) (spdxID string) {
+	api := fmt.Sprintf("https://api.github.com/repos/%s/%s", owner, repo)
+	var (
+		rst map[string]interface{}
+		err error
+	)
+	if rst, err = ghRequestAsMap(api); err == nil {
+		if license, ok := rst["license"].(map[string]interface{}); ok {
+			if spdxID, ok = license["spdx_id"].(string); !ok {
+				spdxID = "N/A"
+			}
+		} else {
+			spdxID = "N/A"
+		}
+	}
+	return
+}
+
+// GetRepoCreateAt Get the watchers of a GitHub repository
+func GetRepoCreateAt(owner, repo string) (create interface{}) {
+	api := fmt.Sprintf("https://api.github.com/repos/%s/%s", owner, repo)
+	var (
+		rst map[string]interface{}
+		err error
+	)
+	if rst, err = ghRequestAsMap(api); err == nil {
+		create = rst["created_at"]
+	}
+	return
+}
+
+// GetRepoWatchers Get the watchers of a GitHub repository
+func GetRepoPushAt(owner, repo string) (lastupdate interface{}) {
+	api := fmt.Sprintf("https://api.github.com/repos/%s/%s", owner, repo)
+	var (
+		rst map[string]interface{}
+		err error
+	)
+	if rst, err = ghRequestAsMap(api); err == nil {
+		lastupdate = rst["pushed_at"]
+	}
+	return
+}
+
 // PrintPages prints the repositories which enabled pages
 func PrintPages(owner string) (output string) {
 	api := fmt.Sprintf("https://api.github.com/users/%s/repos?type=owner&per_page=100&sort=updated&username=%s", owner, owner)
@@ -103,8 +174,8 @@ func ghRequestAsMap(api string) (data map[string]interface{}, err error) {
 }
 
 var pageRepoTemplate = `
-{{if eq .has_pages true}}  
-|{{.name}}|![GitHub Repo stars](https://img.shields.io/github/stars/{{.owner.login}}/{{.name}}?style=social)|[view](https://{{.owner.login}}.github.io/{{.name}}/)| 
+{{if eq .has_pages true}}
+|{{.name}}|![GitHub Repo stars](https://img.shields.io/github/stars/{{.owner.login}}/{{.name}}?style=social)|[view](https://{{.owner.login}}.github.io/{{.name}}/)|
 {{end}}
 `
 

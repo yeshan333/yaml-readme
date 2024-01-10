@@ -3,10 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/Masterminds/sprig"
-	"github.com/linuxsuren/yaml-readme/function"
-	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v2"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -18,6 +14,11 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/Masterminds/sprig"
+	"github.com/linuxsuren/yaml-readme/function"
+	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 )
 
 var logger *log.Logger
@@ -237,6 +238,11 @@ func getFuncMap(readmeTpl string) template.FuncMap {
 		"youTubeLink":  function.YouTubeLink,
 		"gstatic":      function.GStatic,
 		"ghID":         function.GetIDFromGHLink,
+		"ghStar":       function.GetRepoStars,
+		"ghFork":       function.GetRepoForks,
+		"ghCreate":     function.GetRepoCreateAt,
+		"ghUpdate":     function.GetRepoPushAt,
+		"ghLicense":    function.GetRepoLicenses,
 		"printGHTable": function.PrintUserAsTable,
 	}
 }

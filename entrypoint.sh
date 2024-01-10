@@ -32,6 +32,9 @@ while [ $# -gt 0 ]; do
     --tool=*)
       tool="${1#*=}"
       ;;
+    --include-header=*)
+      header="${1#*=}"
+      ;;
     *)
       printf "***************************\n"
       printf "* Error: Invalid argument.*\n"
@@ -47,7 +50,7 @@ then
   hd i "$tool"
 fi
 
-yaml-readme -p "$pattern" --sort-by "$sortby" --group-by "$groupby" --template "$template" > "$output"
+yaml-readme -p "$pattern" --sort-by "$sortby" --group-by "$groupby" --template "$template" --include-header "$header" > "$output"
 
 if [ "$push" = "true" ]
 then
