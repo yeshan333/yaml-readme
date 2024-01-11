@@ -50,7 +50,7 @@ then
   hd i "$tool"
 fi
 
-yaml-readme -p "$pattern" --sort-by "$sortby" --group-by "$groupby" --template "$template" --include-header "$header" > "$output"
+yaml-readme -p "$pattern" --sort-by "$sortby" --group-by "$groupby" --template "$template" --include-header="$header" > "$output"
 
 if [ "$push" = "true" ]
 then
