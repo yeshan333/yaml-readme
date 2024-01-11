@@ -32,7 +32,7 @@ while [ $# -gt 0 ]; do
     --tool=*)
       tool="${1#*=}"
       ;;
-    --include-header=*)
+    --includeHeader=*)
       header="${1#*=}"
       ;;
     *)

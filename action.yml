@@ -53,4 +53,4 @@ runs:
     - --template=${{ inputs.template }}
     - --push=${{ inputs.push }}
     - --tool=${{ inputs.tool }}
-    - --include-header=${{ inputs.header }}
+    - --includeHeader=${{ inputs.header }}
