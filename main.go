@@ -142,7 +142,8 @@ func (o *option) runE(cmd *cobra.Command, args []string) (err error) {
 		err = fmt.Errorf("failed to load metadat from %q", o.pattern)
 		return
 	}
-
+	groupNum := len(groupData)
+	itemNum := len(items)
 	if o.sortBy != "" {
 		sortMetadata(items, o.sortBy)
 	}
@@ -156,25 +157,25 @@ func (o *option) runE(cmd *cobra.Command, args []string) (err error) {
 
 	// render it with grouped data
 	if o.groupBy != "" {
-		err = renderTemplate(readmeTpl, groupData, cmd.OutOrStdout())
+		err = renderTemplate(readmeTpl, groupData, uint(groupNum), uint(itemNum), cmd.OutOrStdout())
 	} else {
-		err = renderTemplate(readmeTpl, items, cmd.OutOrStdout())
+		err = renderTemplate(readmeTpl, items, uint(groupNum), uint(itemNum), cmd.OutOrStdout())
 	}
 	return
 }
 
 func renderTemplateToString(tplContent string, object interface{}) (output string, err error) {
 	buf := bytes.NewBuffer([]byte{})
-	if err = renderTemplate(tplContent, object, buf); err == nil {
+	if err = renderTemplate(tplContent, object, 0, 0, buf); err == nil {
 		output = buf.String()
 	}
 	return
 }
 
-func renderTemplate(tplContent string, object interface{}, writer io.Writer) (err error) {
+func renderTemplate(tplContent string, object interface{}, groupNum, itemNum uint, writer io.Writer) (err error) {
 	var tpl *template.Template
 	if tpl, err = template.New("readme").
-		Funcs(getFuncMap(tplContent)).
+		Funcs(getFuncMap(tplContent, groupNum, itemNum)).
 		Funcs(sprig.FuncMap()).Parse(tplContent); err == nil {
 		err = tpl.Execute(writer, object)
 	}
@@ -188,7 +189,7 @@ fullpath`))
 }
 
 func printFunctions(stdout io.Writer) {
-	funcMap := getFuncMap("")
+	funcMap := getFuncMap("", 0, 0)
 	var funcs []string
 	for k := range funcMap {
 		funcs = append(funcs, k)
@@ -199,7 +200,7 @@ func printFunctions(stdout io.Writer) {
 	_, _ = stdout.Write([]byte(strings.Join(funcs, "\n")))
 }
 
-func getFuncMap(readmeTpl string) template.FuncMap {
+func getFuncMap(readmeTpl string, groupNum, itemNum uint) template.FuncMap {
 	return template.FuncMap{
 		"printHelp": func(cmd string) (output string) {
 			var err error
@@ -212,6 +213,12 @@ func getFuncMap(readmeTpl string) template.FuncMap {
 %s`, "```shell", string(data), "```")
 			}
 			return
+		},
+		"lenItemNum": func() uint {
+			return itemNum
+		},
+		"lenGroupNum": func() uint {
+			return groupNum
 		},
 		"printToc": func() string {
 			return generateTOC(readmeTpl)
