@@ -10,3 +10,4 @@ plugins/vscode/yaml-readme/node_modules/
 .DS_Store
 .vscode-test
 README.tpl
+*.md

@@ -2,15 +2,19 @@ package function
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"regexp"
 	"strings"
-	"time"
+
+	"github.com/gofri/go-github-ratelimit/github_ratelimit"
+	"github.com/google/go-github/github"
+	"golang.org/x/oauth2"
 )
 
 // PrintContributors from a GitHub repository
@@ -40,44 +44,53 @@ func PrintContributors(owner, repo string) (output string) {
 	return
 }
 
+// GetRepoStars awesome ops func
+func GetStarLicense(owner, repo string) (rst string) {
+	pro, err := GetProject(owner, repo)
+	if err != nil {
+		panic(err)
+	} else {
+		var spdxID string
+		if license := pro.GetLicense(); license != nil {
+			spdxID = license.GetSPDXID()
+		} else {
+			spdxID = "N/A"
+		}
+		fmt.Printf("%v|%v|%v|%v", spdxID, pro.GetStargazersCount(), pro.GetCreatedAt().Format("2006-01-02"), pro.GetPushedAt().Format("2006-01-02"))
+	}
+	return
+}
+
 // GetRepoStars Get the stars of a GitHub repository
-func GetRepoStars(owner, repo string) (star interface{}) {
-	api := fmt.Sprintf("https://api.github.com/repos/%s/%s", owner, repo)
-	var (
-		rst map[string]interface{}
-		err error
-	)
-	if rst, err = ghRequestAsMap(api); err == nil {
-		star = rst["stargazers_count"]
+func GetRepoStars(owner, repo string) (star int) {
+	pro, err := GetProject(owner, repo)
+	if err != nil {
+		panic(err)
+	} else {
+		star = pro.GetStargazersCount()
 	}
 	return
 }
 
 // GetRepoForks Get the forks of a GitHub repository
-func GetRepoForks(owner, repo string) (fork interface{}) {
-	api := fmt.Sprintf("https://api.github.com/repos/%s/%s", owner, repo)
-	var (
-		rst map[string]interface{}
-		err error
-	)
-	if rst, err = ghRequestAsMap(api); err == nil {
-		fork = rst["forks"]
+func GetRepoForks(owner, repo string) (fork int) {
+	pro, err := GetProject(owner, repo)
+	if err != nil {
+		panic(err)
+	} else {
+		fork = pro.GetForksCount()
 	}
 	return
 }
 
 // GetRepoWatchers Get the watchers of a GitHub repository
 func GetRepoLicenses(owner, repo string) (spdxID string) {
-	api := fmt.Sprintf("https://api.github.com/repos/%s/%s", owner, repo)
-	var (
-		rst map[string]interface{}
-		err error
-	)
-	if rst, err = ghRequestAsMap(api); err == nil {
-		if license, ok := rst["license"].(map[string]interface{}); ok {
-			if spdxID, ok = license["spdx_id"].(string); !ok {
-				spdxID = "N/A"
-			}
+	pro, err := GetProject(owner, repo)
+	if err != nil {
+		panic(err)
+	} else {
+		if license := pro.GetLicense(); license != nil {
+			spdxID = license.GetSPDXID()
 		} else {
 			spdxID = "N/A"
 		}
@@ -87,30 +100,22 @@ func GetRepoLicenses(owner, repo string) (spdxID string) {
 
 // GetRepoCreateAt Get the watchers of a GitHub repository
 func GetRepoCreateAt(owner, repo string) (create string) {
-	api := fmt.Sprintf("https://api.github.com/repos/%s/%s", owner, repo)
-	var (
-		rst map[string]interface{}
-		err error
-	)
-	if rst, err = ghRequestAsMap(api); err == nil {
-		createdAtStr := rst["created_at"].(string)
-		createdAt, _ := time.Parse(time.RFC3339, createdAtStr)
-		create = createdAt.Format("2006-01-02")
+	pro, err := GetProject(owner, repo)
+	if err != nil {
+		panic(err)
+	} else {
+		create = pro.GetCreatedAt().Format("2006-01-02")
 	}
 	return
 }
 
 // GetRepoWatchers Get the watchers of a GitHub repository
 func GetRepoPushAt(owner, repo string) (lastupdate interface{}) {
-	api := fmt.Sprintf("https://api.github.com/repos/%s/%s", owner, repo)
-	var (
-		rst map[string]interface{}
-		err error
-	)
-	if rst, err = ghRequestAsMap(api); err == nil {
-		updateAtStr := rst["pushed_at"].(string)
-		updateAt, _ := time.Parse(time.RFC3339, updateAtStr)
-		lastupdate = updateAt.Format("2006-01-02")
+	pro, err := GetProject(owner, repo)
+	if err != nil {
+		panic(err)
+	} else {
+		lastupdate = pro.GetPushedAt().Format("2006-01-02")
 	}
 	return
 }
@@ -156,7 +161,7 @@ func ghRequest(api string) (data []byte, err error) {
 		}
 
 		if resp, err = http.DefaultClient.Do(req); err == nil && resp.StatusCode == http.StatusOK {
-			data, err = ioutil.ReadAll(resp.Body)
+			data, err = io.ReadAll(resp.Body)
 		}
 	}
 	return
@@ -324,4 +329,34 @@ func hasLink(text string) (ok bool) {
 	reg, _ := regexp.Compile(".*\\[.*\\]\\(.*\\)")
 	ok = reg.MatchString(text)
 	return
+}
+
+var (
+	client *github.Client
+)
+
+func init() {
+	token := os.Getenv("GITHUB_TOKEN")
+	if token == "" {
+		token = os.Getenv("GH_TOKEN")
+	}
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+	rateLimiter, err := github_ratelimit.NewRateLimitWaiterClient(tc.Transport)
+	if err != nil {
+		panic(err)
+	}
+	client = github.NewClient(rateLimiter)
+}
+
+func GetProject(owner, repoName string) (*github.Repository, error) {
+	ctx := context.Background()
+	repo, _, err := client.Repositories.Get(ctx, owner, repoName)
+	if err != nil {
+		return nil, err
+	}
+	return repo, nil
 }

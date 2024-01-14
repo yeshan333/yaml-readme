@@ -250,6 +250,7 @@ func getFuncMap(readmeTpl string, groupNum, itemNum uint) template.FuncMap {
 		"ghCreate":     function.GetRepoCreateAt,
 		"ghUpdate":     function.GetRepoPushAt,
 		"ghLicense":    function.GetRepoLicenses,
+		"ghCustom":     function.GetStarLicense,
 		"printGHTable": function.PrintUserAsTable,
 	}
 }
