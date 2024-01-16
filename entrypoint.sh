@@ -52,6 +52,14 @@ fi
 
 yaml-readme -p "$pattern" --sort-by "$sortby" --group-by "$groupby" --template "$template" --include-header="$header" > "$output"
 
+if [ $? -eq 0 ]
+then
+  echo "Generate $output successfully"
+else
+  echo "Generate $output failed"
+  exit 1
+fi
+
 if [ "$push" = "true" ]
 then
   git config --local user.email "${username}@users.noreply.github.com"
