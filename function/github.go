@@ -352,6 +352,7 @@ func init() {
 	client = github.NewClient(rateLimiter)
 }
 
+// GetProject 获取项目信息
 func GetProject(owner, repoName string) (*github.Repository, error) {
 	ctx := context.Background()
 	repo, _, err := client.Repositories.Get(ctx, owner, repoName)
@@ -359,4 +360,18 @@ func GetProject(owner, repoName string) (*github.Repository, error) {
 		return nil, err
 	}
 	return repo, nil
+}
+
+// UpdateRepoDescription 更新项目描述
+func UpdateRepoDescription(owner, repoName, description string) error {
+	ctx := context.Background()
+	_, _, err := client.Repositories.Edit(ctx, owner, repoName, &github.Repository{
+		Description: &description,
+	})
+	if err != nil {
+		return err
+	}
+
+	// fmt.Println(repo.GetDescription())
+	return nil
 }
