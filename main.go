@@ -214,17 +214,20 @@ func getFuncMap(readmeTpl string, groupNum, itemNum uint) template.FuncMap {
 			}
 			return
 		},
-		"lenItemNum": func(owner, repo string) uint {
+		"lenItemNum": func() uint {
+			return itemNum
+		},
+		"lenGroupNum": func() uint {
+			return groupNum
+		},
+		"updateDesc": func(owner, repo string) string {
 			desc := fmt.Sprintf("🧰 记录每一个与运维相关的优秀项目，⚗️ 项目内表格通过 GitHub Action 自动生成，📥 当前收录项目 %d 个。", itemNum)
 			err := function.UpdateRepoDescription(owner, repo, desc)
 			if err != nil {
 				fmt.Printf("failed to update repo description, error: %v\n", err)
 				os.Exit(1)
 			}
-			return itemNum
-		},
-		"lenGroupNum": func() uint {
-			return groupNum
+			return ""
 		},
 		"printToc": func() string {
 			return generateTOC(readmeTpl)
