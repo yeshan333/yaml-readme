@@ -57,6 +57,7 @@ then
   echo "Generate $output successfully"
 else
   echo "Generate $output failed"
+  cat "$output"
   exit 1
 fi
 
