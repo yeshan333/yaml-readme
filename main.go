@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -249,6 +250,13 @@ func getFuncMap(readmeTpl string, groupNum, itemNum uint) template.FuncMap {
 		},
 		"getFeedLatestPostPublishedDate": func(feedLink string) string {
 			return function.GetFeedLatestPostPublishedDate(feedLink)
+		},
+		"goUrlDecode": func(link string) string {
+			decodeUrl, err := url.QueryUnescape(link)
+			if err != nil {
+				return link
+			}
+			return decodeUrl
 		},
 		"render":       dataRender,
 		"gh":           function.GithubUserLink,
