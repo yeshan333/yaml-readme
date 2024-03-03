@@ -6,12 +6,12 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
-func GetLatestFeedPost(feedLink string) (output string) {
+func GetLatestFeedPost(feedLink string, defaultContent string) (output string) {
 	fp := gofeed.NewParser()
 	feed, err := fp.ParseURL(feedLink)
 
 	if err != nil {
-		return ""
+		return fmt.Sprintf("[%s](%s)", defaultContent, defaultContent)
 
 	}
 	// get latest post

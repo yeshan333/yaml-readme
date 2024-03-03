@@ -8,7 +8,7 @@ import (
 
 func TestFeed(t *testing.T) {
 	fp := gofeed.NewParser()
-	feed, _ := fp.ParseURL("https://shansan.top/rss2.xml")
+	feed, _ := fp.ParseURL("https://quail.ink/op7418/feed/atom")
 
 	// 获取最新的文章
 	latest := feed.Items[0]
