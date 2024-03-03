@@ -20,7 +20,7 @@ func GetLatestFeedPost(feedLink string, defaultContent string) (output string) {
 	title := latest.Title
 	link := latest.Link
 	publishTime := latest.Published
-	output = fmt.Sprintf("%s: [%s](%s)", publishTime, title, link)
+	output = fmt.Sprintf("%s\n[%s](%s)", publishTime, title, link)
 	// t.Log("Title: ", latest.Title)
 	// t.Log("Link: ", latest.Link)
 	// t.Log("Description: ", latest.Description)
