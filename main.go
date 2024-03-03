@@ -244,6 +244,9 @@ func getFuncMap(readmeTpl string, groupNum, itemNum uint) template.FuncMap {
 		"printPages": func(owner string) string {
 			return function.PrintPages(owner)
 		},
+		"getLatestFeedPost": func(feedLink string) string {
+			return function.GetLatestFeedPost(feedLink)
+		},
 		"render":       dataRender,
 		"gh":           function.GithubUserLink,
 		"ghs":          function.GitHubUsersLink,

@@ -6,8 +6,9 @@ import (
 	"io/ioutil"
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
-import "github.com/stretchr/testify/assert"
 
 func Test_sortBy(t *testing.T) {
 	type args struct {

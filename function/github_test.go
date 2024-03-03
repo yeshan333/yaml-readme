@@ -3,12 +3,13 @@ package function
 import (
 	"bytes"
 	"fmt"
-	"github.com/h2non/gock"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
+
+	"github.com/h2non/gock"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_printContributor(t *testing.T) {
