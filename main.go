@@ -359,6 +359,7 @@ Some functions rely on the GitHub API, in order to avoid X-RateLimit-Limit error
 }
 
 func main() {
+	fmt.Println("tranform yaml to markdown ----------->")
 	if err := newRootCommand().Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
