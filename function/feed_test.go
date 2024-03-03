@@ -8,10 +8,11 @@ import (
 
 func TestFeed(t *testing.T) {
 	fp := gofeed.NewParser()
-	feed, _ := fp.ParseURL("https://quail.ink/op7418/feed/atom")
+	feed, _ := fp.ParseURL("https://github.com/SwiftOldDriver/iOS-Weekly/releases.atom")
 
-	// 获取最新的文章
-	latest := feed.Items[0]
+	// some latest post in the last: https://wiki.eryajf.net/learning-weekly.xml
+	latest := GetLatestPost(feed.Items)
+
 	t.Log("Title: ", latest.Title)
 	t.Log("Link: ", latest.Link)
 	t.Log("Description: ", latest.Description)

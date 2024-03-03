@@ -2,11 +2,20 @@ package function
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/mmcdole/gofeed"
 )
 
-func GetLatestFeedPost(feedLink string, defaultContent string) (output string) {
+func GetLatestPost(items []*gofeed.Item) *gofeed.Item {
+	length := len(items)
+	if items[0].PublishedParsed.After(*items[length-1].PublishedParsed) {
+		return items[0]
+	}
+	return items[length-1]
+}
+
+func GetFeedLatestPost(feedLink string, defaultContent string) (output string) {
 	fp := gofeed.NewParser()
 	feed, err := fp.ParseURL(feedLink)
 
@@ -15,16 +24,24 @@ func GetLatestFeedPost(feedLink string, defaultContent string) (output string) {
 
 	}
 	// get latest post
-	latest := feed.Items[0]
+	latest := GetLatestPost(feed.Items)
 
 	title := latest.Title
 	link := latest.Link
-	publishTime := latest.Published
-	output = fmt.Sprintf("%s\n[%s](%s)", publishTime, title, link)
-	// t.Log("Title: ", latest.Title)
-	// t.Log("Link: ", latest.Link)
-	// t.Log("Description: ", latest.Description)
-	// t.Log("Published: ", latest.Published)
-	// t.Log("Published: ", latest.PublishedParsed)
+	output = fmt.Sprintf("[%s](%s)", title, link)
 	return output
+}
+
+func GetFeedLatestPostPublishedDate(feedLink string) (output string) {
+	fp := gofeed.NewParser()
+	feed, err := fp.ParseURL(feedLink)
+
+	if err != nil {
+		return ""
+	}
+	// get latest post
+	latest := GetLatestPost(feed.Items)
+	publishTime := latest.PublishedParsed.Format(time.RFC3339)
+
+	return publishTime
 }
