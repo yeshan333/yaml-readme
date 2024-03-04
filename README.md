@@ -43,7 +43,7 @@ Flags:
 | `printVisitorCount` | `{{printVisitorCount "repo-id"}}`                  | Print the visitor count chart of an repository                          |
 | `printPages`        | `{{printPages "linuxsuren"}}`                      | Print all the repositories that pages enabled                           |
 | `render`            | `{{render true}}`                                  | Make the value be readable, turn `true` to `:white_check_mark:`         |
-| `gh`                | `{{gh "linuxsuren" true}}`                         | Render a GitHub user to be a link                                       | 
+| `gh`                | `{{gh "linuxsuren" true}}`                         | Render a GitHub user to be a link                                       |
 | `ghs`               | `{{ghs "linuxsuren, linuxsuren" ","}}`             | Render multiple GitHub users to be links                                |
 | `link`              | `{{link "text" "link"}}`                           | Print a Markdown style link                                             |
 | `linkOrEmpty`       | `{{linkOrEmpty "text" "link"}}`                    | Print a Markdown style link or empty if text is none                    |

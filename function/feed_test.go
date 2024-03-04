@@ -18,5 +18,6 @@ func TestFeed(t *testing.T) {
 	t.Log("Description: ", latest.Description)
 	t.Log("Published: ", latest.Published)
 	t.Log("Published: ", latest.PublishedParsed)
+	t.Logf("[%s](%s)", latest.Title, latest.Link)
 	// assert.Equal(t, "【转载】Go语言中的并发模型", latest.Title)
 }

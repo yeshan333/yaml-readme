@@ -2,6 +2,7 @@ package function
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/mmcdole/gofeed"
@@ -26,7 +27,7 @@ func GetFeedLatestPost(feedLink string, defaultContent string) (output string) {
 	// get latest post
 	latest := GetLatestPost(feed.Items)
 
-	title := latest.Title
+	title := strings.ReplaceAll(latest.Title, "|", " ")
 	link := latest.Link
 	output = fmt.Sprintf("[%s](%s)", title, link)
 	return output
