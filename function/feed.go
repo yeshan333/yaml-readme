@@ -8,6 +8,18 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
+func IsThisWeek(t *time.Time) bool {
+	now := time.Now()
+	weekday := int(now.Weekday())
+	if weekday == 0 {
+		weekday = 7
+	}
+	monday := now.AddDate(0, 0, -weekday+1)
+	monday = time.Date(monday.Year(), monday.Month(), monday.Day(), 0, 0, 0, 0, monday.Location())
+	diff := t.Sub(monday)
+	return diff >= 0 && diff < 7*24*time.Hour
+}
+
 func GetLatestPost(items []*gofeed.Item) *gofeed.Item {
 	length := len(items)
 	if items[0].PublishedParsed.After(*items[length-1].PublishedParsed) {
@@ -26,10 +38,12 @@ func GetFeedLatestPost(feedLink string, defaultContent string) (output string) {
 	}
 	// get latest post
 	latest := GetLatestPost(feed.Items)
-
 	title := strings.ReplaceAll(latest.Title, "|", " ")
 	link := latest.Link
 	output = fmt.Sprintf("[%s](%s)", title, link)
+	if IsThisWeek(latest.PublishedParsed) {
+		output += "![news](https://github.com/ChanceYu/front-end-rss/blob/master/assets/new.png?raw=true)"
+	}
 	return output
 }
 
