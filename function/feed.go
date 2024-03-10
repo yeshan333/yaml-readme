@@ -22,6 +22,9 @@ func IsThisWeek(t *time.Time) bool {
 
 func GetLatestPost(items []*gofeed.Item) *gofeed.Item {
 	length := len(items)
+	if length == 0 {
+		return nil
+	}
 	if items[0].PublishedParsed.After(*items[length-1].PublishedParsed) {
 		return items[0]
 	}
@@ -38,6 +41,9 @@ func GetFeedLatestPost(feedLink string, defaultContent string) (output string) {
 	}
 	// get latest post
 	latest := GetLatestPost(feed.Items)
+	if latest == nil {
+		return "no content"
+	}
 	title := strings.ReplaceAll(latest.Title, "|", " ")
 	link := latest.Link
 	output = fmt.Sprintf("[%s](%s)", title, link)
@@ -56,6 +62,9 @@ func GetFeedLatestPostPublishedDate(feedLink string) (output string) {
 	}
 	// get latest post
 	latest := GetLatestPost(feed.Items)
+	if latest == nil {
+		return "no content"
+	}
 	publishTime := latest.PublishedParsed.Format(time.RFC3339)
 
 	return publishTime
