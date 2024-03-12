@@ -42,7 +42,7 @@ func GetFeedLatestPost(feedLink string, defaultContent string) (output string) {
 	// get latest post
 	latest := GetLatestPost(feed.Items)
 	if latest == nil {
-		return "no content"
+		return "feed parsed failed"
 	}
 	title := strings.ReplaceAll(latest.Title, "|", " ")
 	link := latest.Link
@@ -63,7 +63,7 @@ func GetFeedLatestPostPublishedDate(feedLink string) (output string) {
 	// get latest post
 	latest := GetLatestPost(feed.Items)
 	if latest == nil {
-		return "no content"
+		return "feed parsed failed"
 	}
 	publishTime := latest.PublishedParsed.Format(time.RFC3339)
 
