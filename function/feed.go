@@ -46,7 +46,7 @@ func GetFeedLatestPost(feedLink string, defaultContent string) (output string) {
 	}
 	title := strings.ReplaceAll(latest.Title, "|", " ")
 	link := latest.Link
-	output = fmt.Sprintf("[%s](%s)", title, link)
+	output = fmt.Sprintf(`[%s](%s)`, title, link)
 	if IsLastServenDays(latest.PublishedParsed) {
 		output += "![news](https://github.com/ChanceYu/front-end-rss/blob/master/assets/new.png?raw=true)"
 	}
