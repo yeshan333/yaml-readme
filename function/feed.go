@@ -20,15 +20,17 @@ func GetLatestPost(items []*gofeed.Item) *gofeed.Item {
 		return nil
 	}
 
-	if items[length-1].PublishedParsed == nil || items[0].PublishedParsed == nil {
-		return items[0]
+	latest := items[0]
+	for _, item := range items {
+		if item.PublishedParsed == nil {
+			continue
+		}
+		if item.PublishedParsed.After(*latest.PublishedParsed) {
+			latest = item
+		}
 	}
 
-	if items[0].PublishedParsed.After(*items[length-1].PublishedParsed) {
-		return items[0]
-	}
-
-	return items[length-1]
+	return latest
 }
 
 func GetFeedLatestPost(feedLink string, defaultContent string) (output string) {
