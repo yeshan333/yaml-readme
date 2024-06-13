@@ -19,9 +19,15 @@ func GetLatestPost(items []*gofeed.Item) *gofeed.Item {
 	if length == 0 {
 		return nil
 	}
+
+	if items[length-1].PublishedParsed == nil || items[0].PublishedParsed == nil {
+		return items[0]
+	}
+
 	if items[0].PublishedParsed.After(*items[length-1].PublishedParsed) {
 		return items[0]
 	}
+
 	return items[length-1]
 }
 
@@ -50,12 +56,12 @@ func GetFeedLatestPost(feedLink string, defaultContent string) (output string) {
 func GetFeedLatestPostPublishedDate(feedLink string) (output string) {
 	fp := gofeed.NewParser()
 	feed, err := fp.ParseURL(feedLink)
-
 	if err != nil {
 		return ""
 	}
 	// get latest post
 	latest := GetLatestPost(feed.Items)
+
 	if latest == nil {
 		return "feed parsed failed"
 	}

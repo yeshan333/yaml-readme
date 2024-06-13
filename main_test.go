@@ -145,7 +145,7 @@ func Test_printStarHistory(t *testing.T) {
 }
 
 func Test_getFuncMap(t *testing.T) {
-	funcMap := getFuncMap("")
+	funcMap := getFuncMap("", 0, 0)
 	assert.NotNil(t, funcMap["printToc"])
 	assert.NotNil(t, funcMap["printHelp"])
 	assert.NotNil(t, funcMap["printContributors"])
