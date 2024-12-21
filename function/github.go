@@ -284,7 +284,7 @@ func GitHubEmojiLink(user string) (output string) {
 
 // GetIDFromGHLink return the GitHub ID from a link
 func GetIDFromGHLink(link string) string {
-	reg, _ := regexp.Compile("\\[.*\\]\\(.*/|\\)")
+	reg, _ := regexp.Compile(`\\[.*\\]\\(.*/|\\)`)
 	return reg.ReplaceAllString(link, "")
 }
 
