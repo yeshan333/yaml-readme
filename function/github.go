@@ -372,6 +372,5 @@ func UpdateRepoDescription(owner, repoName, description string) error {
 		return err
 	}
 
-	// fmt.Println(repo.GetDescription())
 	return nil
 }

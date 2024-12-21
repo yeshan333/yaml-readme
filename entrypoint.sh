@@ -50,8 +50,7 @@ then
   hd i "$tool"
 fi
 
-yaml-readme -p "$pattern" --sort-by "$sortby" --group-by "$groupby" --template "$template" --include-header="$header" > "$output"
-
+yaml-readme -p "$pattern" --sort-by "$sortby" --group-by "$groupby" --template "$template" --include-header="$header" --output "$output"
 if [ $? -eq 0 ]
 then
   echo "Generate $output successfully"

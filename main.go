@@ -30,9 +30,26 @@ type option struct {
 	includeHeader bool
 	sortBy        string
 	groupBy       string
+	output        string
 
 	printFunctions bool
 	printVariables bool
+}
+
+type FileWriter struct {
+	file *os.File
+}
+
+func NewFileWriter(filePath string) (*FileWriter, error) {
+	file, err := os.Create(filePath)
+	if err != nil {
+		return nil, err
+	}
+	return &FileWriter{file: file}, nil
+}
+
+func (fw *FileWriter) Write(p []byte) (n int, err error) {
+	return fw.file.Write(p)
 }
 
 func loadMetadata(pattern, groupBy string) (items []map[string]interface{},
@@ -105,8 +122,8 @@ func sortMetadata(items []map[string]interface{}, sortByField string) {
 func loadTemplate(templateFile string, includeHeader bool) (readmeTpl string, err error) {
 	// load readme template
 	var data []byte
-	if data, err = ioutil.ReadFile(templateFile); err != nil {
-		fmt.Printf("failed to load README template, error: %v\n", err)
+	if data, err = os.ReadFile(templateFile); err != nil {
+		logger.Printf("failed to load README template, error: %v\n", err)
 		err = nil
 		readmeTpl = `|中文名称|英文名称|JD|
 |---|---|---|
@@ -125,14 +142,23 @@ func loadTemplate(templateFile string, includeHeader bool) (readmeTpl string, er
 }
 
 func (o *option) runE(cmd *cobra.Command, args []string) (err error) {
-	logger = log.New(cmd.ErrOrStderr(), "", log.LstdFlags)
+	logger.Printf("use option: %+v", o)
+
+	writeTo := cmd.OutOrStdout()
+	if o.output != "" {
+		writeTo, err = NewFileWriter(o.output)
+		if err != nil {
+			logger.Fatal(err)
+		}
+	}
+
 	if o.printFunctions {
-		printFunctions(cmd.OutOrStdout())
+		printFunctions(writeTo)
 		return
 	}
 
 	if o.printVariables {
-		printVariables(cmd.OutOrStdout())
+		printVariables(writeTo)
 		return
 	}
 
@@ -158,9 +184,9 @@ func (o *option) runE(cmd *cobra.Command, args []string) (err error) {
 
 	// render it with grouped data
 	if o.groupBy != "" {
-		err = renderTemplate(readmeTpl, groupData, uint(groupNum), uint(itemNum), cmd.OutOrStdout())
+		err = renderTemplate(readmeTpl, groupData, uint(groupNum), uint(itemNum), writeTo)
 	} else {
-		err = renderTemplate(readmeTpl, items, uint(groupNum), uint(itemNum), cmd.OutOrStdout())
+		err = renderTemplate(readmeTpl, items, uint(groupNum), uint(itemNum), writeTo)
 	}
 	return
 }
@@ -365,6 +391,8 @@ Some functions rely on the GitHub API, in order to avoid X-RateLimit-Limit error
 		"Sort the array data descending by which field, or sort it ascending with the prefix '!'. For example: --sort-by !year")
 	flags.StringVarP(&opt.groupBy, "group-by", "", "",
 		"Group the array data by which field")
+	flags.StringVarP(&opt.output, "output", "", "",
+		"output target file path")
 	flags.BoolVarP(&opt.printFunctions, "print-functions", "", false,
 		"Print all the functions and exit")
 	flags.BoolVarP(&opt.printVariables, "print-variables", "", false,
@@ -374,7 +402,10 @@ Some functions rely on the GitHub API, in order to avoid X-RateLimit-Limit error
 
 func main() {
 	if err := newRootCommand().Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		logger.Fatal(err)
 	}
+}
+
+func init() {
+	logger = log.New(os.Stdout, "", log.LstdFlags)
 }
