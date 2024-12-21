@@ -38,6 +38,7 @@ func GetFeedLatestPost(feedLink string, defaultContent string) (output string) {
 	feed, err := fp.ParseURL(feedLink)
 
 	if err != nil {
+		logger.Printf("parse feed %s failed: %s\n", feedLink, err)
 		return fmt.Sprintf("[%s](%s)", defaultContent, defaultContent)
 
 	}

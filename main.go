@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/url"
 	"os"
@@ -61,7 +60,7 @@ func loadMetadata(pattern, groupBy string) (items []map[string]interface{},
 	var data []byte
 	if files, err = filepath.Glob(pattern); err == nil {
 		for _, metaFile := range files {
-			if data, err = ioutil.ReadFile(metaFile); err != nil {
+			if data, err = os.ReadFile(metaFile); err != nil {
 				logger.Printf("failed to read file [%s], error: %v\n", metaFile, err)
 				continue
 			}
